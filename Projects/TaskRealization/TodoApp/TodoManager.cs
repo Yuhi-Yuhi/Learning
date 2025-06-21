@@ -1,62 +1,60 @@
-﻿namespace TodoApp
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Text;
+using System.Text.Json;
+
+namespace TodoApp
 {
     public class TodoManager
     {
         private List<TodoItem> _todoItems = new List<TodoItem>();
-        private int _nextId = 1;
+        private int _nextId = 0;
 
-        public void AddTodoItem(string title)
+        public int AddTodoItem(string title)
         {
             if (string.IsNullOrEmpty(title))
             {
-                Console.WriteLine("Task title can not be empty.");
-                return;
+                throw new ArgumentException("Task title can not be empty.");
             }
 
-            _todoItems.Add(new TodoItem { Id = _nextId++, Title = title, IsCompleted = false });
-            Console.WriteLine("Task was added successfully.");
+            _nextId++;
+            _todoItems.Add(new TodoItem { Id = _nextId, Title = title, IsCompleted = false });
+            return _nextId;
         }
 
-        public void ViewTodoItems()
+        public List<TodoItem> ViewTodoItems() //Сохранение в файлик //1 "One task" false   JSON
         {
-            if (_todoItems.Count == 0)
-            {
-                Console.WriteLine("The task list is empty.");
-                return;
-            }
+            //string jsonPath = Path.Combine(Path.GetTempPath(), "todoItems.json");
+            //string json = JsonSerializer.Serialize(_todoItems);
 
-            foreach (var item in _todoItems)
-            {
-                Console.WriteLine($"Id: {item.Id}. Title: {item.Title}. Completed: {item.IsCompleted}.");
-            }
+            //File.WriteAllText(jsonPath, json);
+
+            return _todoItems;
         }
 
-        public void MarkAsCompleted(int id)
+        public bool MarkAsCompleted(int id)
         {
             var item = _todoItems.FirstOrDefault(i => i.Id == id);
 
             if (item == null)
             {
-                Console.WriteLine("Task not found!");
-                return;
+                return false;
             }
 
             item.IsCompleted = true;
-            Console.WriteLine("Task marked as completed!");
+            return true;
         }
 
-        public void DeleteTodoItem(int id)
+        public bool DeleteTodoItem(int id)
         {
             var item = _todoItems.FirstOrDefault(i => i.Id == id);
 
             if (item == null)
             {
-                Console.WriteLine("Task not found!");
-                return;
+                return false;
             }
 
             _todoItems.Remove(item);
-            Console.WriteLine("Task deleted successfully!");
+            return true;
         }
     }
 }
